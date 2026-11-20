@@ -1,0 +1,123 @@
+
+.auth-loading,
+.auth-message,
+.member-welcome-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 25px;
+  background: #f3f6fb;
+  text-align: center;
+}
+
+.auth-loading p {
+  color: #718198;
+  font-size: 13px;
+  margin-top: 15px;
+}
+
+.auth-message {
+  color: #64748b;
+}
+
+.auth-message > svg {
+  color: #d28b35;
+}
+
+.auth-message h2 {
+  color: #263750;
+}
+
+.auth-message p {
+  max-width: 450px;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.auth-message button,
+.member-welcome-card button {
+  background: #14233d;
+  border: none;
+  color: white;
+  padding: 12px 18px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  margin-top: 20px;
+  font-size: 12px;
+}
+
+.member-welcome-card {
+  width: 100%;
+  max-width: 480px;
+  background: white;
+  border: 1px solid #e9edf3;
+  border-radius: 15px;
+  padding: 35px;
+  box-shadow: 0 15px 50px rgba(25, 42, 70, 0.06);
+}
+
+.member-welcome-logo {
+  width: 58px;
+  height: 58px;
+  background: #14233d;
+  color: white;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  font-weight: 800;
+  margin: 0 auto 20px;
+}
+
+.member-welcome-label {
+  color: #3977d1;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+}
+
+.member-welcome-card h1 {
+  font-size: 24px;
+  color: #263750;
+  margin: 12px 0;
+}
+
+.member-welcome-card > p {
+  color: #8490a2;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.member-account-info {
+  background: #f7f9fc;
+  border-radius: 9px;
+  padding: 17px;
+  margin-top: 23px;
+  text-align: left;
+}
+
+.member-account-info > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid #e9edf3;
+}
+
+.member-account-info > div:last-child {
+  border: none;
+}
+
+.member-account-info span {
+  color: #8490a2;
+  font-size: 11px;
+}
+
+.member-account-info strong {
+  color: #344258;
+  font-size: 11px;
+}
