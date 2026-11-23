@@ -1,9 +1,206 @@
+
 import { useEffect, useState } from "react";
-import { ShieldAlert, LogOut, LoaderCircle } from "lucide-react";
+import {
+  ShieldAlert,
+  LogOut,
+  LoaderCircle,
+  LockKeyhole,
+  Eye,
+  EyeOff,
+  ShieldCheck,
+} from "lucide-react";
 
 import { supabase } from "../lib/supabaseClient";
 import Login from "./Login";
+import MemberPortal from "./MemberPortal";
 import "./AuthGate.css";
+
+function PasswordUpdate() {
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  const handleUpdatePassword = async (event) => {
+    event.preventDefault();
+    setError("");
+    setSuccess("");
+
+    if (password.length < 8) {
+      setError("Your password must contain at least 8 characters.");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError("The passwords do not match.");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const { error: updateError } = await supabase.auth.updateUser({
+        password,
+      });
+
+      if (updateError) {
+        setError(updateError.message);
+        return;
+      }
+
+      setSuccess(
+        "Your password has been updated successfully. Returning to sign in..."
+      );
+
+      const { error: signOutError } = await supabase.auth.signOut();
+
+      if (signOutError) {
+        setError(
+          "Your password was updated, but automatic sign-out failed. Please sign out and log in using your new password."
+        );
+      }
+    } catch {
+      setError("Unable to update your password. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="login-page">
+      <div className="login-card">
+
+        <div className="login-brand">
+          <div className="login-logo">0190</div>
+          <h1>0190 Social Club</h1>
+          <p>Financial Management Portal</p>
+        </div>
+
+        <div className="login-welcome">
+          <div className="login-icon">
+            <LockKeyhole size={27} />
+          </div>
+
+          <h2>Set a New Password</h2>
+          <p>
+            Create a new password for your 0190 Social Club account.
+          </p>
+        </div>
+
+        <form onSubmit={handleUpdatePassword}>
+
+          <div className="login-field">
+            <label>New Password</label>
+
+            <div className="login-input">
+              <LockKeyhole size={18} />
+
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Enter new password"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                autoComplete="new-password"
+                minLength={8}
+                required
+              />
+
+              <button
+                type="button"
+                className="password-toggle"
+                onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? (
+                  <EyeOff size={18} />
+                ) : (
+                  <Eye size={18} />
+                )}
+              </button>
+            </div>
+          </div>
+
+          <div className="login-field">
+            <label>Confirm New Password</label>
+
+            <div className="login-input">
+              <LockKeyhole size={18} />
+
+              <input
+                type={showConfirmPassword ? "text" : "password"}
+                placeholder="Confirm new password"
+                value={confirmPassword}
+                onChange={(event) =>
+                  setConfirmPassword(event.target.value)
+                }
+                autoComplete="new-password"
+                minLength={8}
+                required
+              />
+
+              <button
+                type="button"
+                className="password-toggle"
+                onClick={() =>
+                  setShowConfirmPassword(!showConfirmPassword)
+                }
+                aria-label={
+                  showConfirmPassword ? "Hide password" : "Show password"
+                }
+              >
+                {showConfirmPassword ? (
+                  <EyeOff size={18} />
+                ) : (
+                  <Eye size={18} />
+                )}
+              </button>
+            </div>
+          </div>
+
+          {error && (
+            <div className="login-error" role="alert">
+              {error}
+            </div>
+          )}
+
+          {success && (
+            <div className="login-success" role="status">
+              {success}
+            </div>
+          )}
+
+          <button
+            type="submit"
+            className="login-button"
+            disabled={loading || Boolean(success)}
+          >
+            {loading ? (
+              <>
+                <LoaderCircle size={18} className="login-spinner" />
+                Updating Password...
+              </>
+            ) : (
+              "Update Password"
+            )}
+          </button>
+
+        </form>
+
+        <div className="login-footer">
+          <p>
+            <ShieldCheck size={15} />
+            Secure password recovery
+          </p>
+          <span>0190 Social Club © {new Date().getFullYear()}</span>
+        </div>
+
+      </div>
+    </div>
+  );
+}
 
 function AuthGate({ children }) {
   const [session, setSession] = useState(null);
@@ -11,26 +208,42 @@ function AuthGate({ children }) {
   const [loading, setLoading] = useState(true);
   const [profileLoading, setProfileLoading] = useState(false);
   const [profileError, setProfileError] = useState("");
+  const [recoveryMode, setRecoveryMode] = useState(false);
 
-  // Listen for authentication changes
   useEffect(() => {
     const {
-      data: { subscription }
-    } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, nextSession) => {
+      if (event === "PASSWORD_RECOVERY") {
+        setRecoveryMode(true);
+      }
+
+      if (event === "SIGNED_OUT") {
+        setRecoveryMode(false);
+      }
+
       setSession(nextSession);
       setProfile(null);
       setProfileError("");
-      setProfileLoading(Boolean(nextSession));
+
+      // Do not load a profile while the user is resetting a password.
+      setProfileLoading(
+        Boolean(nextSession) && event !== "PASSWORD_RECOVERY"
+      );
+
       setLoading(false);
     });
 
-    return () => {
-      subscription.unsubscribe();
-    };
+    return () => subscription.unsubscribe();
   }, []);
 
-  // Retrieve the logged-in user's profile
   useEffect(() => {
+    if (recoveryMode) {
+      setProfile(null);
+      setProfileLoading(false);
+      return;
+    }
+
     if (!session?.user?.id) {
       setProfile(null);
       setProfileLoading(false);
@@ -64,7 +277,7 @@ function AuthGate({ children }) {
         setProfile(null);
       } else if (!data) {
         setProfileError(
-          "No active club profile was found for this account."
+          "No club profile was found for this account."
         );
         setProfile(null);
       } else if (data.account_status !== "active") {
@@ -72,10 +285,15 @@ function AuthGate({ children }) {
           "Your 0190 Social Club account has been disabled. Please contact an administrator."
         );
         setProfile(null);
+      } else if (!["admin", "member"].includes(data.role)) {
+        setProfileError(
+          "Your account does not have an authorised portal role."
+        );
+        setProfile(null);
       } else {
         setProfile({
           ...data,
-          email: session.user.email
+          email: session.user.email,
         });
       }
 
@@ -87,7 +305,7 @@ function AuthGate({ children }) {
     return () => {
       isActive = false;
     };
-  }, [session]);
+  }, [session, recoveryMode]);
 
   const handleSignOut = async () => {
     const { error } = await supabase.auth.signOut();
@@ -96,6 +314,10 @@ function AuthGate({ children }) {
       setProfileError(error.message);
     }
   };
+
+  if (recoveryMode) {
+    return <PasswordUpdate />;
+  }
 
   if (loading) {
     return (
@@ -106,7 +328,6 @@ function AuthGate({ children }) {
     );
   }
 
-  // No authenticated session: display login
   if (!session) {
     return <Login />;
   }
@@ -120,18 +341,14 @@ function AuthGate({ children }) {
     );
   }
 
-  // Reject missing, inaccessible or disabled profiles
   if (profileError || !profile) {
-    const message =
-      profileError || "Your club profile could not be loaded.";
-
     return (
       <div className="auth-message">
         <ShieldAlert size={38} />
-
         <h2>Account access unavailable</h2>
-
-        <p>{message}</p>
+        <p>
+          {profileError || "Your club profile could not be loaded."}
+        </p>
 
         <button onClick={handleSignOut}>
           <LogOut size={17} />
@@ -141,57 +358,18 @@ function AuthGate({ children }) {
     );
   }
 
-  // Members receive a separate, read-only landing page
-  if (profile.role !== "admin") {
+  if (profile.role === "member") {
     return (
-      <div className="member-welcome-page">
-        <div className="member-welcome-card">
-
-          <div className="member-welcome-logo">0190</div>
-
-          <span className="member-welcome-label">
-            MEMBER PORTAL
-          </span>
-
-          <h1>Welcome, {profile.full_name}</h1>
-
-          <p>
-            Your 0190 Social Club account is connected.
-            Your personal financial dashboard will be
-            available here.
-          </p>
-
-          <div className="member-account-info">
-            <div>
-              <span>Member number</span>
-              <strong>{profile.member_number || "Not assigned"}</strong>
-            </div>
-
-            <div>
-              <span>Membership status</span>
-              <strong>{profile.membership_status}</strong>
-            </div>
-
-            <div>
-              <span>Account status</span>
-              <strong>{profile.account_status}</strong>
-            </div>
-          </div>
-
-          <button onClick={handleSignOut}>
-            <LogOut size={17} />
-            Sign out
-          </button>
-
-        </div>
-      </div>
+      <MemberPortal
+        profile={profile}
+        onSignOut={handleSignOut}
+      />
     );
   }
 
-  // Only administrators can access the administration dashboard
   return children({
     profile,
-    onSignOut: handleSignOut
+    onSignOut: handleSignOut,
   });
 }
 

@@ -230,3 +230,648 @@
     padding: 15px;
   }
 }
+
+.statement-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin-bottom: 24px;
+}
+
+.statement-card {
+  min-width: 0;
+}
+
+.statement-history {
+  margin-top: 28px;
+}
+
+.statement-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.statement-table-wrapper table {
+  width: 100%;
+  min-width: 850px;
+  border-collapse: collapse;
+}
+
+@media (max-width: 900px) {
+  .statement-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 550px) {
+  .statement-cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* ==================================================
+   0190 SOCIAL CLUB
+   MEMBER FINANCIAL STATEMENTS
+   CORPORATE DESIGN SYSTEM
+================================================== */
+
+.member-statement {
+  color: #172b46;
+}
+
+/* Page heading */
+
+.statement-eyebrow {
+  color: #326ba7;
+  font-weight: 800;
+  letter-spacing: 1.3px;
+}
+
+.statement-heading h1 {
+  color: #193b63;
+  font-weight: 750;
+  letter-spacing: -0.6px;
+}
+
+.statement-heading p {
+  color: #718096;
+  line-height: 1.6;
+}
+
+.statement-icon,
+.member-avatar {
+  color: #326ba7;
+  background: #eaf2fc;
+  border-radius: 11px;
+}
+
+.statement-heading-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.statement-print-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 42px;
+  padding: 11px 17px;
+  color: #ffffff;
+  background: #193b63;
+  border: 1px solid #193b63;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 650;
+  transition: all 0.2s ease;
+}
+
+.statement-print-button:hover:not(:disabled) {
+  background: #24558a;
+  border-color: #24558a;
+  transform: translateY(-1px);
+}
+
+.statement-print-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Member selection */
+
+.statement-selector {
+  background: #ffffff;
+  border: 1px solid #e3eaf2;
+  border-radius: 12px;
+  box-shadow: 0 3px 12px rgba(20, 45, 75, 0.035);
+}
+
+.statement-selector label {
+  color: #344761;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.statement-selector select {
+  color: #263c58;
+  background: #ffffff;
+  border-color: #dce4ee;
+  border-radius: 8px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.statement-selector select:focus {
+  outline: none;
+  border-color: #326ba7;
+  box-shadow: 0 0 0 3px rgba(50, 107, 167, 0.10);
+}
+
+/* Selected member profile */
+
+.statement-member-info {
+  background: #ffffff;
+  border: 1px solid #e3eaf2;
+  border-radius: 12px;
+  box-shadow: 0 3px 12px rgba(20, 45, 75, 0.035);
+}
+
+.statement-member-info h2 {
+  color: #193b63;
+  font-weight: 750;
+}
+
+.statement-member-info p {
+  color: #718096;
+  font-size: 13px;
+}
+
+.disabled-label {
+  color: #b42332;
+  background: #fff1f2;
+  border: 1px solid #fecdd3;
+  border-radius: 20px;
+  font-weight: 700;
+}
+
+/* Financial summary cards */
+
+.statement-card {
+  background: #ffffff;
+  border: 1px solid #e3eaf2;
+  border-radius: 12px;
+  box-shadow: 0 3px 12px rgba(20, 45, 75, 0.035);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.statement-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: #326ba7;
+}
+
+.statement-card:nth-child(2)::before {
+  background: #c5a45d;
+}
+
+.statement-card:nth-child(3)::before {
+  background: #dc6338;
+}
+
+.statement-card:nth-child(4)::before {
+  background: #7c5ce0;
+}
+
+.statement-card:nth-child(5)::before {
+  background: #079568;
+}
+
+.statement-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 7px 20px rgba(20, 45, 75, 0.08);
+}
+
+.statement-card > svg {
+  color: #326ba7;
+}
+
+.statement-card p {
+  color: #718096;
+  font-weight: 550;
+}
+
+.statement-card h3 {
+  color: #193b63;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+}
+
+/* Financial history panels */
+
+.statement-history {
+  background: #ffffff;
+  border: 1px solid #e3eaf2;
+  border-radius: 12px;
+  box-shadow: 0 3px 12px rgba(20, 45, 75, 0.035);
+}
+
+.history-heading {
+  border-bottom: 1px solid #e8edf4;
+  padding-bottom: 17px;
+}
+
+.history-heading h2 {
+  color: #193b63;
+  font-weight: 750;
+}
+
+.history-heading p {
+  color: #7b8ba2;
+  line-height: 1.5;
+}
+
+.history-heading > svg {
+  color: #326ba7;
+}
+
+/* Financial tables */
+
+.statement-table-wrapper {
+  border-radius: 8px;
+}
+
+.statement-table-wrapper table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.statement-table-wrapper th {
+  color: #526780;
+  background: #f1f5fa;
+  border-bottom: 1px solid #e3eaf2;
+  font-weight: 750;
+  letter-spacing: 0.4px;
+  white-space: nowrap;
+}
+
+.statement-table-wrapper td {
+  color: #526176;
+  border-bottom: 1px solid #e9eef5;
+  vertical-align: middle;
+}
+
+.statement-table-wrapper tbody tr {
+  transition: background 0.15s ease;
+}
+
+.statement-table-wrapper tbody tr:hover {
+  background: #f7faff;
+}
+
+.statement-table-wrapper tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.statement-table-wrapper td:first-child {
+  color: #193b63;
+  font-weight: 650;
+}
+
+.empty-row {
+  color: #8391a5 !important;
+  padding: 35px !important;
+}
+
+/* Messages */
+
+.statement-error {
+  color: #b42332;
+  background: #fff1f2;
+  border: 1px solid #fecdd3;
+  border-radius: 9px;
+}
+
+.statement-loading,
+.statement-empty {
+  color: #718096;
+  background: #ffffff;
+  border: 1px solid #e3eaf2;
+  border-radius: 10px;
+}
+
+/* Print header - hidden on screen */
+
+.statement-print-header {
+  display: none;
+}
+
+/* ==================================================
+   DARK MODE
+================================================== */
+
+[data-theme="dark"] .member-statement {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .statement-eyebrow {
+  color: #93c5fd;
+}
+
+[data-theme="dark"] .statement-heading h1 {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .statement-heading p {
+  color: #a7b4c6;
+}
+
+[data-theme="dark"] .statement-icon,
+[data-theme="dark"] .member-avatar {
+  color: #93c5fd;
+  background: #1e3a5f;
+}
+
+[data-theme="dark"] .statement-print-button {
+  color: #ffffff;
+  background: #24558a;
+  border-color: #326ba7;
+}
+
+[data-theme="dark"] .statement-print-button:hover:not(:disabled) {
+  background: #326ba7;
+}
+
+/* Dark member selector */
+
+[data-theme="dark"] .statement-selector {
+  background: #1f2937;
+  border-color: #374151;
+}
+
+[data-theme="dark"] .statement-selector label {
+  color: #e2e8f0;
+}
+
+[data-theme="dark"] .statement-selector select {
+  color: #f1f5f9;
+  background: #273449;
+  border-color: #475569;
+  color-scheme: dark;
+}
+
+/* Dark member profile */
+
+[data-theme="dark"] .statement-member-info {
+  background: #1f2937;
+  border-color: #374151;
+}
+
+[data-theme="dark"] .statement-member-info h2 {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .statement-member-info p {
+  color: #a7b4c6;
+}
+
+[data-theme="dark"] .disabled-label {
+  color: #fca5a5;
+  background: #450a0a;
+  border-color: #7f1d1d;
+}
+
+/* Dark financial cards */
+
+[data-theme="dark"] .statement-card {
+  background: #1f2937;
+  border-color: #374151;
+  box-shadow: none;
+}
+
+[data-theme="dark"] .statement-card p {
+  color: #a7b4c6;
+}
+
+[data-theme="dark"] .statement-card h3 {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .statement-card > svg {
+  color: #93c5fd;
+}
+
+/* Dark history panels */
+
+[data-theme="dark"] .statement-history {
+  background: #1f2937;
+  border-color: #374151;
+  box-shadow: none;
+}
+
+[data-theme="dark"] .history-heading {
+  border-bottom-color: #374151;
+}
+
+[data-theme="dark"] .history-heading h2 {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .history-heading p {
+  color: #a7b4c6;
+}
+
+[data-theme="dark"] .history-heading > svg {
+  color: #93c5fd;
+}
+
+/* Dark financial tables */
+
+[data-theme="dark"] .statement-table-wrapper th {
+  color: #cbd5e1;
+  background: #273449;
+  border-bottom-color: #374151;
+}
+
+[data-theme="dark"] .statement-table-wrapper td {
+  color: #cbd5e1;
+  border-bottom-color: #374151;
+}
+
+[data-theme="dark"] .statement-table-wrapper td:first-child {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .statement-table-wrapper tbody tr:hover {
+  background: #273449;
+}
+
+[data-theme="dark"] .empty-row {
+  color: #94a3b8 !important;
+}
+
+/* Dark messages */
+
+[data-theme="dark"] .statement-error {
+  color: #fecaca;
+  background: #450a0a;
+  border-color: #7f1d1d;
+}
+
+[data-theme="dark"] .statement-loading,
+[data-theme="dark"] .statement-empty {
+  color: #a7b4c6;
+  background: #1f2937;
+  border-color: #374151;
+}
+
+/* Accessibility */
+
+.member-statement button:focus-visible,
+.member-statement select:focus-visible {
+  outline: 3px solid rgba(74, 132, 196, 0.4);
+  outline-offset: 2px;
+}
+
+/* ==================================================
+   RESPONSIVE DESIGN
+================================================== */
+
+@media (max-width: 900px) {
+  .statement-heading {
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .statement-heading-actions {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+}
+
+@media (max-width: 650px) {
+  .statement-heading {
+    flex-direction: column;
+  }
+
+  .statement-heading-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .statement-print-button {
+    flex: 1;
+  }
+
+  .statement-member-info {
+    align-items: flex-start;
+  }
+
+  .statement-history {
+    padding: 16px;
+  }
+
+  .history-heading {
+    gap: 12px;
+  }
+}
+
+/* ==================================================
+   PRINT-FRIENDLY FINANCIAL STATEMENT
+================================================== */
+
+@media print {
+  @page {
+    size: A4;
+    margin: 15mm;
+  }
+
+  body {
+    background: #ffffff !important;
+    color: #172b46 !important;
+  }
+
+  .sidebar,
+  .topbar,
+  .page-footer,
+  .statement-heading,
+  .statement-selector,
+  .statement-error,
+  .statement-print-button {
+    display: none !important;
+  }
+
+  .main-area,
+  .page-content,
+  .member-statement {
+    width: 100% !important;
+    max-width: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: #ffffff !important;
+    color: #172b46 !important;
+    overflow: visible !important;
+  }
+
+  .statement-print-header {
+    display: block !important;
+    margin-bottom: 25px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid #193b63;
+    color: #172b46 !important;
+  }
+
+  .statement-print-header h2 {
+    margin: 0 0 6px;
+    color: #193b63 !important;
+    font-size: 22px;
+  }
+
+  .statement-print-header p {
+    margin: 4px 0;
+    color: #526176 !important;
+    font-size: 11px;
+  }
+
+  .statement-member-info,
+  .statement-card,
+  .statement-history {
+    background: #ffffff !important;
+    color: #172b46 !important;
+    border: 1px solid #dce4ee !important;
+    box-shadow: none !important;
+    break-inside: avoid;
+  }
+
+  .statement-member-info h2,
+  .statement-card h3,
+  .history-heading h2 {
+    color: #193b63 !important;
+  }
+
+  .statement-card p,
+  .statement-member-info p,
+  .history-heading p {
+    color: #526176 !important;
+  }
+
+  .statement-table-wrapper {
+    overflow: visible !important;
+  }
+
+  .statement-table-wrapper table {
+    width: 100% !important;
+    min-width: 0 !important;
+    font-size: 9px !important;
+  }
+
+  .statement-table-wrapper th,
+  .statement-table-wrapper td {
+    padding: 7px 5px !important;
+    color: #263c58 !important;
+    background: #ffffff !important;
+    border-bottom: 1px solid #dce4ee !important;
+    font-size: 9px !important;
+  }
+
+  .statement-table-wrapper th {
+    background: #edf2f8 !important;
+    font-weight: 700 !important;
+  }
+
+  .statement-history {
+    margin-top: 18px !important;
+    padding: 14px !important;
+  }
+
+  .statement-card::before {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+}

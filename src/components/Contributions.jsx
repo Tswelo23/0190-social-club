@@ -6,7 +6,9 @@ import {
   Wallet,
   Receipt,
   CalendarDays,
-  X
+  X,
+  Pencil,
+  Trash2,
 } from "lucide-react";
 
 import "./Contributions.css";
@@ -16,16 +18,15 @@ const emptyForm = () => ({
   amount: "",
   interestContribution: "0",
   contributionDate: new Date().toISOString().slice(0, 10),
-  notes: ""
+  notes: "",
 });
 
 const formatCurrency = (amount) =>
   new Intl.NumberFormat("en-ZA", {
     style: "currency",
-    currency: "ZAR"
+    currency: "ZAR",
   }).format(Number(amount || 0));
 
-// Parse "YYYY-MM-DD" as a local date to avoid timezone shifts
 const formatDate = (value) => {
   if (!value) return "—";
   return new Date(`${value}T00:00:00`).toLocaleDateString("en-ZA");
@@ -38,9 +39,13 @@ function Contributions() {
   const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [deletingId, setDeletingId] = useState(null);
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
   const [showForm, setShowForm] = useState(false);
+
+  const [editingContributionId, setEditingContributionId] =
+    useState(null);
 
   const [selectedMonth, setSelectedMonth] = useState(
     String(today.getMonth() + 1)
@@ -56,6 +61,7 @@ function Contributions() {
     loadData();
   }, []);
 
+  // Load contributions and member profiles.
   const loadData = async () => {
     try {
       setLoading(true);
@@ -71,7 +77,6 @@ function Contributions() {
 
       if (contributionError) throw contributionError;
 
-      // All member profiles, so past payments from disabled members still show names
       const { data: memberData, error: memberError } = await supabase
         .from("profiles")
         .select("id, full_name, member_number, account_status")
@@ -88,7 +93,7 @@ function Contributions() {
 
           return {
             ...contribution,
-            profiles: member || null
+            profiles: member || null,
           };
         }
       );
@@ -103,34 +108,116 @@ function Contributions() {
     }
   };
 
-  // Only active members can receive new contributions
+  // Only active members can receive new contributions.
   const activeMembers = members.filter(
     (member) => member.account_status === "active"
   );
 
+  // When editing, also allow previously suspended members.
+  const formMembers = editingContributionId
+    ? members
+    : activeMembers;
+
+  // Open a new contribution form.
   const openForm = () => {
     setError("");
+    setEditingContributionId(null);
     setFormData(emptyForm());
     setShowForm(true);
   };
 
-  const closeForm = () => {
+  // Open an existing contribution for editing.
+  const handleEditContribution = (contribution) => {
     setError("");
-    setShowForm(false);
+
+    setEditingContributionId(contribution.id);
+
+    setFormData({
+      memberId: contribution.member_id,
+      amount: String(contribution.amount ?? ""),
+      interestContribution: String(
+        contribution.interest_contribution ?? 0
+      ),
+      contributionDate: contribution.contribution_date,
+      notes: contribution.notes || "",
+    });
+
+    setShowForm(true);
   };
 
+  // Permanently delete a contribution (after confirmation).
+  const handleDeleteContribution = async (contribution) => {
+    const memberName =
+      contribution.profiles?.full_name || "this member";
+
+    const confirmed = window.confirm(
+      `Are you sure you want to permanently delete this contribution from ${memberName}?\n\nSavings: ${formatCurrency(
+        contribution.amount
+      )}\nInterest: ${formatCurrency(
+        contribution.interest_contribution
+      )}\nDate: ${formatDate(
+        contribution.contribution_date
+      )}\n\nThis action cannot be undone.`
+    );
+
+    if (!confirmed) return;
+
+    try {
+      setError("");
+      setDeletingId(contribution.id);
+
+      // .select("id") returns the deleted rows, so we can detect
+      // a delete that was silently blocked by Row Level Security.
+      const { data: deletedRows, error: deleteError } = await supabase
+        .from("contributions")
+        .delete()
+        .eq("id", contribution.id)
+        .select("id");
+
+      if (deleteError) throw deleteError;
+
+      if (!deletedRows || deletedRows.length === 0) {
+        throw new Error(
+          "The contribution was not deleted. You may not have permission to delete contributions."
+        );
+      }
+
+      setContributions((previous) =>
+        previous.filter((item) => item.id !== contribution.id)
+      );
+
+      alert("Contribution deleted successfully.");
+    } catch (err) {
+      console.error("Contribution deletion failed:", err);
+      setError(err.message || "Unable to delete contribution.");
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
+  // Close and reset the form.
+  const closeForm = () => {
+    if (saving) return;
+
+    setError("");
+    setShowForm(false);
+    setEditingContributionId(null);
+    setFormData(emptyForm());
+  };
+
+  // Handle form inputs.
   const handleInputChange = (event) => {
     const { name, value } = event.target;
 
     setFormData((previous) => ({
       ...previous,
-      [name]: value
+      [name]: value,
     }));
   };
 
+  // Save a new contribution or update an existing one.
   const handleAddContribution = async (event) => {
     event.preventDefault();
-
     setError("");
 
     if (!formData.memberId) {
@@ -138,70 +225,145 @@ function Contributions() {
       return;
     }
 
-    if (formData.amount === "" || Number(formData.amount) <= 0) {
+    const savingsAmount = Number(formData.amount);
+    const interestContribution = Number(
+      formData.interestContribution || 0
+    );
+
+    if (
+      formData.amount === "" ||
+      !Number.isFinite(savingsAmount) ||
+      savingsAmount <= 0
+    ) {
       setError("Savings contribution must be greater than zero.");
       return;
     }
 
-    const interestContribution = Number(formData.interestContribution || 0);
-
-    if (!Number.isFinite(interestContribution) || interestContribution < 0) {
+    if (
+      !Number.isFinite(interestContribution) ||
+      interestContribution < 0
+    ) {
       setError("Interest contribution cannot be negative.");
+      return;
+    }
+
+    if (!formData.contributionDate) {
+      setError("Please select a payment date.");
       return;
     }
 
     setSaving(true);
 
     try {
-      const { data, error } = await supabase
+      const contributionPayload = {
+        member_id: formData.memberId,
+        amount: savingsAmount,
+        interest_contribution: interestContribution,
+        contribution_date: formData.contributionDate,
+        notes: formData.notes.trim() || null,
+      };
+
+      // UPDATE existing contribution.
+      if (editingContributionId) {
+        const { data, error: updateError } = await supabase
+          .from("contributions")
+          .update(contributionPayload)
+          .eq("id", editingContributionId)
+          .select(
+            "id, member_id, amount, interest_contribution, contribution_date, notes"
+          )
+          .single();
+
+        if (updateError) throw updateError;
+
+        const updatedContribution = {
+          ...data,
+          profiles:
+            members.find(
+              (member) => member.id === data.member_id
+            ) || null,
+        };
+
+        setContributions((previous) =>
+          previous
+            .map((item) =>
+              item.id === editingContributionId
+                ? updatedContribution
+                : item
+            )
+            .sort((a, b) =>
+              b.contribution_date.localeCompare(a.contribution_date)
+            )
+        );
+
+        setShowForm(false);
+        setEditingContributionId(null);
+        setFormData(emptyForm());
+
+        alert("Contribution updated successfully.");
+        return;
+      }
+
+      // INSERT new contribution.
+      const { data, error: insertError } = await supabase
         .from("contributions")
-        .insert({
-          member_id: formData.memberId,
-          amount: Number(formData.amount),
-          interest_contribution: interestContribution,
-          contribution_date: formData.contributionDate,
-          notes: formData.notes.trim() || null
-        })
+        .insert(contributionPayload)
         .select()
         .single();
 
-      if (error) throw error;
+      if (insertError) throw insertError;
 
       setContributions((previous) => [
         {
           ...data,
           profiles:
-            members.find((member) => member.id === data.member_id) || null
+            members.find(
+              (member) => member.id === data.member_id
+            ) || null,
         },
-        ...previous
+        ...previous,
       ]);
 
       setFormData(emptyForm());
       setShowForm(false);
+
+      alert("Contribution recorded successfully.");
     } catch (err) {
-      console.error("Contribution creation failed:", err);
-      setError(err.message);
+      console.error("Contribution save failed:", err);
+      setError(err.message || "Unable to save contribution.");
     } finally {
       setSaving(false);
     }
   };
 
-  // All-time totals (summary tiles)
-  const totalContributions = contributions.reduce(
+  // Contributions belonging strictly to the selected year.
+  const yearContributions = contributions.filter((item) => {
+    const contributionYear = Number(
+      (item.contribution_date || "").slice(0, 4)
+    );
+
+    return contributionYear === Number(selectedYear);
+  });
+
+  // Selected-year totals.
+  const totalContributions = yearContributions.reduce(
     (sum, item) => sum + Number(item.amount || 0),
     0
   );
 
-  const totalInterestContributions = contributions.reduce(
-    (sum, item) => sum + Number(item.interest_contribution || 0),
+  const totalInterestContributions = yearContributions.reduce(
+    (sum, item) =>
+      sum + Number(item.interest_contribution || 0),
     0
   );
 
-  const totalTransactions = contributions.length;
+  const totalTransactions = yearContributions.length;
 
-  // Contributions in the selected month and year (ignores the search box)
+  // Contributions for selected month and year.
   const monthContributions = contributions.filter((item) => {
-    const contributionDate = new Date(`${item.contribution_date}T00:00:00`);
+    const contributionDate = new Date(
+      `${item.contribution_date}T00:00:00`
+    );
 
     return (
       contributionDate.getMonth() + 1 === Number(selectedMonth) &&
@@ -209,7 +371,7 @@ function Contributions() {
     );
   });
 
-  // Table rows: selected month and year, narrowed by the search box
+  // Search selected month's transactions.
   const filteredContributions = monthContributions.filter((item) => {
     const name = item.profiles?.full_name || "";
     const number = item.profiles?.member_number || "";
@@ -225,16 +387,18 @@ function Contributions() {
   );
 
   const monthlyInterestTotal = monthContributions.reduce(
-    (sum, item) => sum + Number(item.interest_contribution || 0),
+    (sum, item) =>
+      sum + Number(item.interest_contribution || 0),
     0
   );
 
-  // Active members with no savings contribution in the selected month
+  // Active members without savings contributions in selected month.
   const membersWithoutSavingsContribution = activeMembers.filter(
     (member) =>
       !monthContributions.some(
         (item) =>
-          item.member_id === member.id && Number(item.amount) > 0
+          item.member_id === member.id &&
+          Number(item.amount) > 0
       )
   );
 
@@ -245,7 +409,7 @@ function Contributions() {
 
   return (
     <section className="contributions-page">
-
+      {/* Page heading */}
       <div className="contributions-heading">
         <div>
           <span className="eyebrow">FINANCIAL MANAGEMENT</span>
@@ -262,14 +426,15 @@ function Contributions() {
         </button>
       </div>
 
+      {/* Statistics (selected year) */}
       <div className="contribution-stats">
-
         <div className="contribution-stat-tile">
           <div className="contribution-stat-icon">
             <Wallet size={22} />
           </div>
+
           <div>
-            <p>Total Savings Contributions</p>
+            <p>Total Savings Contributions ({selectedYear})</p>
             <h2>{formatCurrency(totalContributions)}</h2>
           </div>
         </div>
@@ -278,8 +443,9 @@ function Contributions() {
           <div className="contribution-stat-icon">
             <Receipt size={22} />
           </div>
+
           <div>
-            <p>Total Interest Contributions</p>
+            <p>Total Interest Contributions ({selectedYear})</p>
             <h2>{formatCurrency(totalInterestContributions)}</h2>
           </div>
         </div>
@@ -288,12 +454,12 @@ function Contributions() {
           <div className="contribution-stat-icon">
             <CalendarDays size={22} />
           </div>
+
           <div>
-            <p>Total Transactions</p>
+            <p>Total Transactions ({selectedYear})</p>
             <h2>{totalTransactions}</h2>
           </div>
         </div>
-
       </div>
 
       {error && !showForm && (
@@ -306,14 +472,17 @@ function Contributions() {
       <div className="contribution-filters">
         <div className="contribution-filter-group">
           <label>Month</label>
+
           <select
             value={selectedMonth}
-            onChange={(event) => setSelectedMonth(event.target.value)}
+            onChange={(event) =>
+              setSelectedMonth(event.target.value)
+            }
           >
             {Array.from({ length: 12 }, (_, index) => (
               <option key={index + 1} value={index + 1}>
                 {new Date(2000, index).toLocaleString("en-ZA", {
-                  month: "long"
+                  month: "long",
                 })}
               </option>
             ))}
@@ -322,9 +491,12 @@ function Contributions() {
 
         <div className="contribution-filter-group">
           <label>Year</label>
+
           <select
             value={selectedYear}
-            onChange={(event) => setSelectedYear(event.target.value)}
+            onChange={(event) =>
+              setSelectedYear(event.target.value)
+            }
           >
             {yearOptions.map((year) => (
               <option key={year} value={year}>
@@ -348,7 +520,7 @@ function Contributions() {
         </div>
       </div>
 
-      {/* Members who have not contributed this month */}
+      {/* Members without contributions */}
       {!loading && (
         <div className="contribution-status">
           <h3>Members Without Savings Contributions</h3>
@@ -362,7 +534,8 @@ function Contributions() {
             <ul>
               {membersWithoutSavingsContribution.map((member) => (
                 <li key={member.id}>
-                  {member.full_name} ({member.member_number || "No number"})
+                  {member.full_name} (
+                  {member.member_number || "No number"})
                 </li>
               ))}
             </ul>
@@ -370,8 +543,8 @@ function Contributions() {
         </div>
       )}
 
+      {/* Payment history */}
       <div className="contribution-table-panel">
-
         <div className="contribution-table-header">
           <div>
             <h3>Payment History</h3>
@@ -380,6 +553,7 @@ function Contributions() {
 
           <div className="contribution-search">
             <Search size={18} />
+
             <input
               type="text"
               placeholder="Search members..."
@@ -390,7 +564,9 @@ function Contributions() {
         </div>
 
         {loading ? (
-          <p className="contribution-message">Loading contributions...</p>
+          <p className="contribution-message">
+            Loading contributions...
+          </p>
         ) : (
           <div className="contribution-table-wrapper">
             <table>
@@ -402,28 +578,67 @@ function Contributions() {
                   <th>Savings Contribution</th>
                   <th>Interest Contribution</th>
                   <th>Notes</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
 
               <tbody>
                 {filteredContributions.map((item) => (
                   <tr key={item.id}>
-                    <td>{item.profiles?.full_name || "Unknown Member"}</td>
-                    <td>{item.profiles?.member_number || "—"}</td>
+                    <td>
+                      {item.profiles?.full_name || "Unknown Member"}
+                    </td>
+
+                    <td>
+                      {item.profiles?.member_number || "—"}
+                    </td>
+
                     <td>{formatDate(item.contribution_date)}</td>
+
                     <td className="contribution-amount">
                       {formatCurrency(item.amount)}
                     </td>
+
                     <td className="contribution-amount">
                       {formatCurrency(item.interest_contribution)}
                     </td>
+
                     <td>{item.notes || "—"}</td>
+
+                    <td>
+                      <div className="contribution-actions">
+                        <button
+                          type="button"
+                          className="edit-contribution-button"
+                          title="Edit contribution"
+                          aria-label="Edit contribution"
+                          onClick={() =>
+                            handleEditContribution(item)
+                          }
+                        >
+                          <Pencil size={16} />
+                        </button>
+
+                        <button
+                          type="button"
+                          className="delete-contribution-button"
+                          title="Delete contribution"
+                          aria-label="Delete contribution"
+                          disabled={deletingId === item.id}
+                          onClick={() =>
+                            handleDeleteContribution(item)
+                          }
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </td>
                   </tr>
                 ))}
 
                 {filteredContributions.length === 0 && (
                   <tr>
-                    <td colSpan="6" className="contribution-empty">
+                    <td colSpan="7" className="contribution-empty">
                       No contributions found for this month.
                     </td>
                   </tr>
@@ -432,31 +647,40 @@ function Contributions() {
             </table>
           </div>
         )}
-
       </div>
 
+      {/* Add / Edit Contribution Modal */}
       {showForm && (
         <div className="contribution-modal-backdrop">
           <div className="contribution-modal">
-
             <div className="contribution-modal-header">
               <div>
-                <h2>Record Contribution</h2>
-                <p>Enter the member's payment details.</p>
+                <h2>
+                  {editingContributionId
+                    ? "Edit Contribution"
+                    : "Record Contribution"}
+                </h2>
+
+                <p>
+                  {editingContributionId
+                    ? "Update the existing payment details."
+                    : "Enter the member's payment details."}
+                </p>
               </div>
 
               <button
                 type="button"
                 onClick={closeForm}
                 aria-label="Close form"
+                disabled={saving}
               >
                 <X size={21} />
               </button>
             </div>
 
             <form onSubmit={handleAddContribution}>
-
               <label>Member</label>
+
               <select
                 name="memberId"
                 value={formData.memberId}
@@ -465,14 +689,19 @@ function Contributions() {
               >
                 <option value="">Select a member</option>
 
-                {activeMembers.map((member) => (
+                {formMembers.map((member) => (
                   <option key={member.id} value={member.id}>
-                    {member.full_name} ({member.member_number || "No number"})
+                    {member.full_name} (
+                    {member.member_number || "No number"})
+                    {member.account_status === "disabled"
+                      ? " - Suspended"
+                      : ""}
                   </option>
                 ))}
               </select>
 
               <label>Savings Contribution (R)</label>
+
               <input
                 type="number"
                 name="amount"
@@ -485,6 +714,7 @@ function Contributions() {
               />
 
               <label>Interest Contribution (R)</label>
+
               <input
                 type="number"
                 name="interestContribution"
@@ -496,8 +726,10 @@ function Contributions() {
               />
 
               <label>Payment Date</label>
+
               <div className="contribution-date-input">
                 <CalendarDays size={18} />
+
                 <input
                   type="date"
                   name="contributionDate"
@@ -508,6 +740,7 @@ function Contributions() {
               </div>
 
               <label>Notes (Optional)</label>
+
               <textarea
                 name="notes"
                 value={formData.notes}
@@ -523,20 +756,26 @@ function Contributions() {
               )}
 
               <div className="contribution-form-actions">
-                <button type="button" onClick={closeForm}>
+                <button
+                  type="button"
+                  onClick={closeForm}
+                  disabled={saving}
+                >
                   Cancel
                 </button>
 
                 <button type="submit" disabled={saving}>
-                  {saving ? "Saving..." : "Save Contribution"}
+                  {saving
+                    ? "Saving..."
+                    : editingContributionId
+                      ? "Update Contribution"
+                      : "Save Contribution"}
                 </button>
               </div>
-
             </form>
           </div>
         </div>
       )}
-
     </section>
   );
 }

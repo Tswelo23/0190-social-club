@@ -1,12 +1,9 @@
-
 import { useEffect, useState } from "react";
 import {
   UserRound,
-  Wallet,
-  Percent,
   Receipt,
-  RefreshCw,
   CalendarDays,
+  Printer,
 } from "lucide-react";
 
 import { supabase } from "../lib/supabaseClient";
@@ -18,11 +15,28 @@ const formatCurrency = (amount) =>
     currency: "ZAR",
   }).format(Number(amount || 0));
 
+const formatDate = (value) =>
+  value
+    ? new Date(`${value}T00:00:00`).toLocaleDateString("en-ZA")
+    : "—";
+
+const getLoanStatusLabel = (status) => {
+  switch (status) {
+    case "paid":
+      return "Fully repaid";
+    case "partially_paid":
+      return "Partially repaid";
+    default:
+      return "Outstanding";
+  }
+};
+
 export default function MemberFinancialStatement() {
   const [members, setMembers] = useState([]);
   const [selectedMember, setSelectedMember] = useState("");
   const [summary, setSummary] = useState(null);
   const [contributions, setContributions] = useState([]);
+  const [loans, setLoans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -61,6 +75,7 @@ export default function MemberFinancialStatement() {
     if (!selectedMember) {
       setSummary(null);
       setContributions([]);
+      setLoans([]);
       return;
     }
 
@@ -69,7 +84,7 @@ export default function MemberFinancialStatement() {
         setLoading(true);
         setError("");
 
-        const [summaryResult, contributionResult] =
+        const [summaryResult, contributionResult, loanResult] =
           await Promise.all([
             supabase
               .from("member_financial_summary")
@@ -84,13 +99,21 @@ export default function MemberFinancialStatement() {
               )
               .eq("member_id", selectedMember)
               .order("contribution_date", { ascending: false }),
+
+            supabase
+              .from("loan_balances")
+              .select("*")
+              .eq("member_id", selectedMember)
+              .order("loan_date", { ascending: false }),
           ]);
 
         if (summaryResult.error) throw summaryResult.error;
         if (contributionResult.error) throw contributionResult.error;
+        if (loanResult.error) throw loanResult.error;
 
         setSummary(summaryResult.data);
         setContributions(contributionResult.data || []);
+        setLoans(loanResult.data || []);
       } catch (err) {
         console.error("Financial statement error:", err);
         setError(err.message);
@@ -106,12 +129,29 @@ export default function MemberFinancialStatement() {
     (member) => member.id === selectedMember
   );
 
+  const generatedOn = new Date().toLocaleDateString("en-ZA", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+
   if (loading && members.length === 0) {
     return <div className="statement-loading">Loading members...</div>;
   }
 
   return (
     <div className="member-statement">
+      {/* Shown only on the printed page */}
+      <div className="statement-print-header">
+        <h2>0190 Social Club</h2>
+        <p>Member Financial Statement</p>
+        <p>
+          {selectedProfile?.full_name || "Member"} (
+          {selectedProfile?.member_number || "No member number"})
+        </p>
+        <p>Generated on {generatedOn}</p>
+      </div>
+
       <div className="statement-heading">
         <div>
           <span className="statement-eyebrow">
@@ -121,8 +161,20 @@ export default function MemberFinancialStatement() {
           <p>Review individual member financial positions and history.</p>
         </div>
 
-        <div className="statement-icon">
-          <Receipt size={25} />
+        <div className="statement-heading-actions">
+          <button
+            type="button"
+            className="statement-print-button"
+            onClick={() => window.print()}
+            disabled={!selectedMember || loading}
+          >
+            <Printer size={18} />
+            Print Statement
+          </button>
+
+          <div className="statement-icon">
+            <Receipt size={25} />
+          </div>
         </div>
       </div>
 
@@ -191,54 +243,28 @@ export default function MemberFinancialStatement() {
             <>
               <div className="statement-cards">
                 <div className="statement-card">
-                  <Wallet size={23} />
-                  <p>Total Savings Contributions</p>
-                  <h3>
-                    {formatCurrency(summary?.total_contributions)}
-                  </h3>
+                  <p>Total Contributions</p>
+                  <h3>{formatCurrency(summary?.total_contributions)}</h3>
                 </div>
 
                 <div className="statement-card">
-                  <Percent size={23} />
-                  <p>Total Interest Contributions</p>
-                  <h3>
-                    {formatCurrency(summary?.total_interest)}
-                  </h3>
+                  <p>Total Interest</p>
+                  <h3>{formatCurrency(summary?.total_interest)}</h3>
                 </div>
 
                 <div className="statement-card">
-                  <Receipt size={23} />
-                  <p>Other Payments</p>
-                  <h3>
-                    {formatCurrency(summary?.total_other_payments)}
-                  </h3>
+                  <p>Outstanding Fines</p>
+                  <h3>{formatCurrency(summary?.outstanding_fines)}</h3>
                 </div>
 
                 <div className="statement-card">
-                  <RefreshCw size={23} />
-                  <p>Outstanding Loans</p>
-                  <h3>
-                    {formatCurrency(summary?.outstanding_loans)}
-                  </h3>
-                </div>
-              </div>
-
-              <div className="statement-cards secondary-cards">
-                <div className="statement-card">
-                  <p>Total Fines</p>
-                  <h3>{formatCurrency(summary?.total_fines)}</h3>
+                  <p>Total Loan Repayable</p>
+                  <h3>{formatCurrency(summary?.total_loan_repayable)}</h3>
                 </div>
 
                 <div className="statement-card">
-                  <p>Total Loans Issued</p>
-                  <h3>{formatCurrency(summary?.total_loans)}</h3>
-                </div>
-
-                <div className="statement-card">
-                  <p>Total Loan Repayments</p>
-                  <h3>
-                    {formatCurrency(summary?.total_loan_repayments)}
-                  </h3>
+                  <p>Outstanding Loan Balance</p>
+                  <h3>{formatCurrency(summary?.outstanding_loans)}</h3>
                 </div>
               </div>
 
@@ -272,16 +298,59 @@ export default function MemberFinancialStatement() {
                       ) : (
                         contributions.map((item) => (
                           <tr key={item.id}>
-                            <td>
-                              {new Date(
-                                `${item.contribution_date}T00:00:00`
-                              ).toLocaleDateString("en-ZA")}
-                            </td>
+                            <td>{formatDate(item.contribution_date)}</td>
                             <td>{formatCurrency(item.amount)}</td>
                             <td>
                               {formatCurrency(item.interest_contribution)}
                             </td>
                             <td>{item.notes || "—"}</td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </section>
+
+              <section className="statement-history">
+                <div className="history-heading">
+                  <div>
+                    <h2>Loan History</h2>
+                    <p>Loan amounts, interest and repayment balances</p>
+                  </div>
+                </div>
+
+                <div className="statement-table-wrapper">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Loan Date</th>
+                        <th>Principal</th>
+                        <th>Interest</th>
+                        <th>Total Repayable</th>
+                        <th>Repaid</th>
+                        <th>Outstanding</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+
+                    <tbody>
+                      {loans.length === 0 ? (
+                        <tr>
+                          <td colSpan="7" className="empty-row">
+                            No loans found for this member.
+                          </td>
+                        </tr>
+                      ) : (
+                        loans.map((loan) => (
+                          <tr key={loan.loan_id}>
+                            <td>{formatDate(loan.loan_date)}</td>
+                            <td>{formatCurrency(loan.principal_amount)}</td>
+                            <td>{formatCurrency(loan.interest_amount)}</td>
+                            <td>{formatCurrency(loan.total_repayable)}</td>
+                            <td>{formatCurrency(loan.total_repaid)}</td>
+                            <td>{formatCurrency(loan.outstanding_balance)}</td>
+                            <td>{getLoanStatusLabel(loan.payment_status)}</td>
                           </tr>
                         ))
                       )}

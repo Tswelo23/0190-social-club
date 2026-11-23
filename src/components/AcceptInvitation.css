@@ -1,95 +1,475 @@
+/* =========================================
+   0190 SOCIAL CLUB
+   ACCEPT INVITATION (SET PASSWORD)
+   Self-contained. Dark mode follows [data-theme="dark"] on any parent.
+   ========================================= */
 
-.invitation-page {
+.inv {
+  --inv-bg-a: #f3f6fb;
+  --inv-bg-b: #e9eef6;
+  --inv-surface: #ffffff;
+  --inv-field: #fbfcfe;
+  --inv-border: #dce2ec;
+  --inv-card-border: #e5e9f0;
+  --inv-text: #17243b;
+  --inv-label: #34445d;
+  --inv-muted: #66738a;
+  --inv-placeholder: #8a96a8;
+
+  --inv-primary: #142f55;
+  --inv-primary-hover: #244d85;
+  --inv-primary-text: #ffffff;
+  --inv-focus: #315da0;
+  --inv-focus-ring: rgba(49, 93, 160, 0.14);
+
+  --inv-gold: #c69a45;
+  --inv-logo-bg: #14233d;
+  --inv-logo-text: #e5bd70;
+
+  --inv-green: #1b7a52;
+  --inv-green-soft: #eaf7f0;
+  --inv-red: #a93636;
+  --inv-red-soft: #fff0ef;
+  --inv-red-border: #f3d1ce;
+  --inv-blue-soft: #edf3ff;
+  --inv-blue-icon: #315da0;
+  --inv-track: #e3e8f0;
+
+  --inv-weak: #d45c53;
+  --inv-fair: #d5a64e;
+  --inv-good: #3b8fd1;
+  --inv-strong: #269968;
+
+  color-scheme: light;
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 20px;
-  background: #f3f6fb;
+  color: var(--inv-text);
+  background:
+    radial-gradient(circle at top left, rgba(198, 154, 69, 0.1), transparent 35%),
+    linear-gradient(135deg, var(--inv-bg-a) 0%, var(--inv-bg-b) 100%);
 }
 
-.invitation-card {
+[data-theme="dark"] .inv {
+  --inv-bg-a: #0e1726;
+  --inv-bg-b: #0e1726;
+  --inv-surface: #182438;
+  --inv-field: #202f45;
+  --inv-border: #3a4a62;
+  --inv-card-border: #2b3a50;
+  --inv-text: #edf2f8;
+  --inv-label: #dce4ef;
+  --inv-muted: #a7b2c3;
+  --inv-placeholder: #8998ad;
+
+  --inv-primary: #d6ad61;
+  --inv-primary-hover: #e5bd70;
+  --inv-primary-text: #17243b;
+  --inv-focus: #d6ad61;
+  --inv-focus-ring: rgba(214, 173, 97, 0.16);
+
+  --inv-green: #5fd3a0;
+  --inv-green-soft: #1e4036;
+  --inv-red: #ffb5a8;
+  --inv-red-soft: #442725;
+  --inv-red-border: #70403c;
+  --inv-blue-soft: #243a5c;
+  --inv-blue-icon: #8fb3ec;
+  --inv-track: #33445d;
+
+  --inv-weak: #e0746b;
+  --inv-fair: #d5a64e;
+  --inv-good: #5aa9e6;
+  --inv-strong: #3bb581;
+
+  color-scheme: dark;
+}
+
+.inv *,
+.inv *::before,
+.inv *::after {
+  box-sizing: border-box;
+}
+
+.inv button,
+.inv input {
+  font: inherit;
+}
+
+.inv-card {
   width: 100%;
-  max-width: 440px;
-  background: white;
-  padding: 38px;
-  border-radius: 15px;
+  max-width: 460px;
+  padding: 42px;
   text-align: center;
-  box-shadow: 0 15px 45px rgba(25, 42, 70, 0.07);
+  background: var(--inv-surface);
+  border: 1px solid var(--inv-card-border);
+  border-radius: 18px;
+  box-shadow: 0 20px 55px rgba(20, 35, 61, 0.09);
+  animation: inv-appear 0.45s ease;
 }
 
-.invitation-logo {
-  width: 58px;
-  height: 58px;
-  background: #14233d;
-  color: white;
-  border-radius: 12px;
+[data-theme="dark"] .inv-card {
+  box-shadow: 0 20px 55px rgba(0, 0, 0, 0.25);
+}
+
+@keyframes inv-appear {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.inv-logo {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 22px;
   display: grid;
   place-items: center;
-  margin: 0 auto 25px;
+  background: var(--inv-logo-bg);
+  color: var(--inv-logo-text);
+  border: 1px solid rgba(229, 189, 112, 0.35);
+  border-radius: 14px;
+  font-size: 17px;
   font-weight: 800;
+  letter-spacing: 0.5px;
+  box-shadow: 0 7px 18px rgba(20, 35, 61, 0.16);
 }
 
-.invitation-card h1 {
-  font-size: 23px;
-  color: #263750;
-  margin: 15px 0 10px;
+.inv-icon {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 6px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--inv-blue-soft);
+  color: var(--inv-blue-icon);
 }
 
-.invitation-card p {
-  color: #8490a2;
-  font-size: 12px;
-  line-height: 1.7;
-  margin-bottom: 25px;
+.inv-icon.success {
+  background: var(--inv-green-soft);
+  color: var(--inv-green);
 }
 
-.invitation-card form {
+.inv-icon.danger {
+  background: var(--inv-red-soft);
+  color: var(--inv-red);
+}
+
+.inv-card h1 {
+  margin: 14px 0 10px;
+  color: var(--inv-text);
+  font-size: 25px;
+  font-weight: 750;
+  letter-spacing: -0.5px;
+}
+
+.inv-card > p,
+.inv-state > p {
+  max-width: 350px;
+  margin: 0 auto 26px;
+  color: var(--inv-muted);
+  font-size: 13.5px;
+  line-height: 1.75;
+}
+
+.inv-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.inv-state > svg {
+  color: var(--inv-focus);
+}
+
+.inv-spin {
+  animation: inv-rotate 1s linear infinite;
+}
+
+@keyframes inv-rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Form */
+
+.inv form {
+  margin-top: 8px;
   text-align: left;
 }
 
-.invitation-card label {
+.inv label {
   display: block;
-  font-size: 12px;
-  font-weight: 600;
-  color: #45546b;
-  margin: 17px 0 8px;
+  margin: 18px 0 8px;
+  color: var(--inv-label);
+  font-size: 12.5px;
+  font-weight: 700;
 }
 
-.invitation-card input {
+.inv form label:first-child {
+  margin-top: 0;
+}
+
+.inv-field {
+  position: relative;
+}
+
+.inv-field input {
   width: 100%;
-  height: 45px;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  padding: 0 12px;
+  height: 47px;
+  padding: 0 14px;
+  color: var(--inv-text);
+  background: var(--inv-field);
+  border: 1px solid var(--inv-border);
+  border-radius: 9px;
+  font-size: 14px;
   outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.invitation-card input:focus {
-  border-color: #3977d1;
+.inv-field:has(.inv-eye) input {
+  padding-right: 46px;
 }
 
-.invitation-card button {
-  width: 100%;
-  padding: 13px;
-  border: none;
+.inv-field input::placeholder {
+  color: var(--inv-placeholder);
+}
+
+.inv-field input:focus {
+  border-color: var(--inv-focus);
+  box-shadow: 0 0 0 3px var(--inv-focus-ring);
+}
+
+.inv-field input[aria-invalid="true"] {
+  border-color: var(--inv-weak);
+}
+
+.inv-eye {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  width: 36px;
+  height: 36px;
+  margin-top: -18px;
+  display: grid;
+  place-items: center;
+  border: 0;
   border-radius: 8px;
-  background: #3277d1;
-  color: white;
-  font-weight: 600;
-  margin-top: 22px;
+  background: transparent;
+  color: var(--inv-muted);
   cursor: pointer;
 }
 
-.invitation-card button:disabled {
-  opacity: 0.6;
+.inv-eye:hover {
+  color: var(--inv-text);
+}
+
+.inv-eye:focus-visible,
+.inv-button:focus-visible {
+  outline: 3px solid rgba(198, 154, 69, 0.5);
+  outline-offset: 2px;
+}
+
+.inv-hint {
+  margin: 8px 0 0;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.inv-hint.warn {
+  color: var(--inv-red);
+}
+
+.inv-hint.good {
+  color: var(--inv-green);
+}
+
+/* Strength meter and requirements */
+
+.inv-strength {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.inv-meter {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 5px;
+}
+
+.inv-meter i {
+  height: 5px;
+  border-radius: 4px;
+  background: var(--inv-track);
+  transition: background 0.25s ease;
+}
+
+.inv-meter.weak i.on {
+  background: var(--inv-weak);
+}
+
+.inv-meter.fair i.on {
+  background: var(--inv-fair);
+}
+
+.inv-meter.good i.on {
+  background: var(--inv-good);
+}
+
+.inv-meter.strong i.on {
+  background: var(--inv-strong);
+}
+
+.inv-strength span {
+  min-width: 62px;
+  text-align: right;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.inv-strength span.weak {
+  color: var(--inv-weak);
+}
+
+.inv-strength span.fair {
+  color: var(--inv-fair);
+}
+
+.inv-strength span.good {
+  color: var(--inv-good);
+}
+
+.inv-strength span.strong {
+  color: var(--inv-strong);
+}
+
+.inv-checks {
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 7px;
+}
+
+.inv-checks li {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--inv-muted);
+  font-size: 12.5px;
+}
+
+.inv-checks li span {
+  width: 17px;
+  height: 17px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border: 1.5px solid var(--inv-border);
+  border-radius: 50%;
+  color: #fff;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.inv-checks li.ok {
+  color: var(--inv-text);
+}
+
+.inv-checks li.ok span {
+  background: var(--inv-strong);
+  border-color: var(--inv-strong);
+}
+
+.inv-checks small {
+  margin-left: auto;
+  color: var(--inv-placeholder);
+  font-size: 11px;
+}
+
+/* Error and button */
+
+.inv-error {
+  margin-top: 18px;
+  padding: 12px;
+  color: var(--inv-red);
+  background: var(--inv-red-soft);
+  border: 1px solid var(--inv-red-border);
+  border-radius: 8px;
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+.inv-button {
+  width: 100%;
+  min-height: 48px;
+  margin-top: 22px;
+  padding: 13px;
+  color: var(--inv-primary-text);
+  background: var(--inv-primary);
+  border: 1px solid var(--inv-primary);
+  border-radius: 9px;
+  font-size: 13.5px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.inv-state .inv-button {
+  margin-top: 4px;
+}
+
+.inv-button:hover:not(:disabled) {
+  background: var(--inv-primary-hover);
+}
+
+.inv-button:disabled {
+  opacity: 0.65;
   cursor: not-allowed;
 }
 
-.invitation-error {
-  background: #fff0f0;
-  color: #ba4141;
-  padding: 11px;
-  border-radius: 7px;
-  font-size: 11px;
-  margin-top: 15px;
+/* Small screens */
+
+@media (max-width: 480px) {
+  .inv {
+    padding: 16px;
+  }
+
+  .inv-card {
+    padding: 30px 22px;
+    border-radius: 14px;
+  }
+
+  .inv-card h1 {
+    font-size: 22px;
+  }
+
+  .inv-logo {
+    width: 58px;
+    height: 58px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .inv-card,
+  .inv-spin {
+    animation: none;
+  }
+
+  .inv *,
+  .inv *::before,
+  .inv *::after {
+    transition: none !important;
+  }
 }

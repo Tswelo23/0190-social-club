@@ -530,3 +530,1011 @@
   opacity: 0.65;
   cursor: not-allowed;
 }
+
+
+.statement-print-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 12px 18px;
+  border: none;
+  border-radius: 8px;
+  background: #244d85;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.statement-print-button:hover {
+  background: #193a68;
+}
+
+@media print {
+  body {
+    background: white !important;
+  }
+
+  .sidebar,
+  .topbar,
+  .statement-selector,
+  .statement-print-button {
+    display: none !important;
+  }
+
+  .member-statement {
+    width: 100%;
+    padding: 0;
+  }
+
+  .statement-heading h1 {
+    font-size: 24px;
+  }
+
+  .statement-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .statement-card,
+  .statement-member-info,
+  .statement-history {
+    break-inside: avoid;
+    border: 1px solid #ddd;
+  }
+
+  .statement-table-wrapper {
+    overflow: visible;
+  }
+
+  .statement-table-wrapper table {
+    min-width: 100%;
+  }
+
+  .statement-table-wrapper th,
+  .statement-table-wrapper td {
+    color: black;
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 15mm;
+  }
+}
+
+.member-filter-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 0 24px 18px;
+}
+
+.member-filter-tabs button {
+  padding: 9px 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #fff;
+  color: #475569;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.member-filter-tabs button:hover {
+  background: #f8fafc;
+}
+
+.member-filter-tabs button.active {
+  background: #1e40af;
+  border-color: #1e40af;
+  color: #fff;
+}
+
+.member-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.member-actions button:hover {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.member-actions .delete-member-action:hover {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.member-status.left {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.member-status.disabled {
+  background: #fff7ed;
+  color: #c2410c;
+}
+
+.member-status.active {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+@media (max-width: 650px) {
+  .member-filter-tabs {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .member-filter-tabs button {
+    flex: 1 1 auto;
+  }
+}
+
+
+/* ==================================================
+   0190 SOCIAL CLUB
+   CORPORATE MEMBERS MANAGEMENT DESIGN
+================================================== */
+
+/* ---------- Page foundation ---------- */
+
+.members-page {
+  color: var(--color-text);
+}
+
+.members-heading h1 {
+  color: var(--brand-primary);
+  font-size: 29px;
+  font-weight: 750;
+  letter-spacing: -0.7px;
+}
+
+.members-heading .eyebrow {
+  color: var(--brand-secondary);
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 1.1px;
+}
+
+.members-heading p {
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* ---------- Buttons ---------- */
+
+.add-member-button,
+.save-member-button {
+  min-height: 42px;
+  padding: 11px 18px;
+  border: 1px solid var(--brand-primary);
+  border-radius: 8px;
+  background: var(--brand-primary);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 650;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
+}
+
+.add-member-button:hover,
+.save-member-button:hover {
+  background: var(--brand-secondary);
+  border-color: var(--brand-secondary);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+/* ---------- Statistics cards ---------- */
+
+.member-statistics {
+  gap: 18px;
+  margin-bottom: 24px;
+}
+
+.member-stat-card {
+  min-height: 100px;
+  padding: 22px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.member-stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.member-stat-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 11px;
+}
+
+.member-stat-icon.blue {
+  color: #2563eb;
+  background: #eff6ff;
+}
+
+.member-stat-icon.green {
+  color: #059669;
+  background: #ecfdf5;
+}
+
+.member-stat-icon.orange {
+  color: #d97706;
+  background: #fff7ed;
+}
+
+.member-stat-card span {
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  font-weight: 550;
+}
+
+.member-stat-card h2 {
+  margin-top: 6px;
+  color: var(--color-text);
+  font-size: 27px;
+  font-weight: 750;
+}
+
+/* ---------- Directory panel ---------- */
+
+.members-panel {
+  padding: 24px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.members-panel-header {
+  margin-bottom: 20px;
+}
+
+.members-panel-header h3 {
+  color: var(--color-text);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.members-panel-header p {
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* ---------- Search ---------- */
+
+.member-search {
+  width: 280px;
+  min-height: 42px;
+  padding: 0 13px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface-secondary);
+  color: var(--color-text-secondary);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.member-search:focus-within {
+  border-color: var(--brand-secondary);
+  box-shadow: 0 0 0 3px rgba(36, 85, 138, 0.1);
+}
+
+.member-search input {
+  background: transparent;
+  color: var(--color-text);
+  font-size: 12px;
+}
+
+.member-search input::placeholder {
+  color: var(--color-text-secondary);
+}
+
+/* ---------- Status filters ---------- */
+
+.member-filter-tabs {
+  gap: 8px;
+  padding: 0 0 18px;
+}
+
+.member-filter-tabs button {
+  padding: 9px 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 7px;
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.member-filter-tabs button:hover {
+  color: var(--brand-primary);
+  background: var(--color-surface-secondary);
+  border-color: var(--brand-secondary);
+}
+
+.member-filter-tabs button.active {
+  color: #ffffff;
+  background: var(--brand-primary);
+  border-color: var(--brand-primary);
+}
+
+/* ---------- Member table ---------- */
+
+.members-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--color-border);
+  border-radius: 9px;
+}
+
+.members-table {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.members-table th {
+  padding: 15px 14px;
+  color: var(--color-text-secondary);
+  background: var(--color-surface-secondary);
+  border-bottom: 1px solid var(--color-border);
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: 0.65px;
+}
+
+.members-table td {
+  padding: 15px 14px;
+  color: var(--color-text-secondary);
+  border-bottom: 1px solid var(--color-border);
+  font-size: 12px;
+  vertical-align: middle;
+}
+
+.members-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.members-table tbody tr {
+  transition: background 0.15s ease;
+}
+
+.members-table tbody tr:hover {
+  background: var(--color-surface-secondary);
+}
+
+.directory-member {
+  gap: 12px;
+}
+
+.directory-member strong {
+  color: var(--color-text);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.directory-member span {
+  color: var(--color-text-secondary);
+  font-size: 11px;
+}
+
+.directory-avatar {
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  background: #e8eff7;
+  color: var(--brand-primary);
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.member-number-cell {
+  color: var(--color-text) !important;
+  font-weight: 650;
+  letter-spacing: 0.2px;
+}
+
+.empty-members {
+  color: var(--color-text-secondary) !important;
+  text-align: center;
+  padding: 38px !important;
+}
+
+/* ---------- Membership status badges ---------- */
+
+.member-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 75px;
+  padding: 6px 10px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.member-status.active {
+  color: #15803d;
+  background: #dcfce7;
+}
+
+.member-status.suspended,
+.member-status.inactive {
+  color: #a16207;
+  background: #fef3c7;
+}
+
+.member-status.disabled,
+.member-status.withdrawn {
+  color: #b91c1c;
+  background: #fee2e2;
+}
+
+.member-status.left {
+  color: #475569;
+  background: #f1f5f9;
+}
+
+/* ---------- Table action buttons ---------- */
+
+.member-actions {
+  gap: 6px;
+}
+
+.member-actions button {
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--color-border);
+  border-radius: 7px;
+  color: var(--color-text-secondary);
+  background: var(--color-surface);
+  transition: all 0.2s ease;
+}
+
+.member-actions button:hover {
+  color: var(--brand-secondary);
+  background: var(--color-surface-secondary);
+  border-color: var(--brand-secondary);
+}
+
+.member-actions .delete-member-action {
+  color: #dc2626;
+  background: #fff1f2;
+  border-color: #ffe4e6;
+}
+
+.member-actions .delete-member-action:hover {
+  color: #ffffff;
+  background: #dc2626;
+  border-color: #dc2626;
+}
+
+/* ---------- Modal overlays ---------- */
+
+.member-modal-overlay {
+  z-index: 1200;
+  padding: 20px;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(4px);
+}
+
+.member-modal,
+.member-delete-modal {
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  box-shadow: var(--shadow-lg);
+  color: var(--color-text);
+}
+
+.member-modal {
+  max-width: 540px;
+  padding: 28px;
+}
+
+.member-delete-modal {
+  max-width: 450px;
+  padding: 30px;
+}
+
+.member-modal-header {
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.member-modal-header h2,
+.member-delete-modal h2 {
+  color: var(--color-text);
+  font-size: 19px;
+  font-weight: 750;
+}
+
+.member-modal-header p,
+.member-delete-modal > p {
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.modal-close {
+  flex-shrink: 0;
+  color: var(--color-text-secondary);
+  background: var(--color-surface-secondary);
+  border: 1px solid var(--color-border);
+}
+
+.modal-close:hover {
+  color: var(--brand-primary);
+  border-color: var(--brand-accent);
+}
+
+/* ---------- Form fields ---------- */
+
+.member-form-group {
+  gap: 7px;
+  margin-bottom: 19px;
+}
+
+.member-form-group label {
+  color: var(--color-text);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.member-form-group > input,
+.member-input-icon {
+  min-height: 44px;
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+}
+
+.member-form-group > input {
+  padding: 0 13px;
+}
+
+.member-input-icon {
+  padding: 0 12px;
+  color: var(--color-text-secondary);
+}
+
+.member-input-icon input {
+  color: var(--color-text);
+  background: transparent;
+}
+
+.member-form-group > input:focus,
+.member-input-icon:focus-within {
+  border-color: var(--brand-secondary);
+  outline: 3px solid rgba(36, 85, 138, 0.1);
+}
+
+.member-default-info {
+  padding: 16px;
+  margin-bottom: 20px;
+  color: var(--color-text-secondary);
+  background: var(--color-surface-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 9px;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.member-default-info strong {
+  color: var(--color-text);
+  font-size: 12px;
+}
+
+.member-default-info small {
+  color: var(--color-text-secondary);
+  font-size: 11px;
+}
+
+.member-form-actions {
+  gap: 10px;
+  padding-top: 15px;
+  border-top: 1px solid var(--color-border);
+}
+
+.cancel-member-button {
+  padding: 11px 17px;
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.cancel-member-button:hover {
+  background: var(--color-surface-secondary);
+}
+
+/* ---------- Delete confirmation ---------- */
+
+.delete-warning-icon {
+  color: #dc2626;
+  background: #fee2e2;
+}
+
+.delete-member-details {
+  color: var(--color-text);
+  background: var(--color-surface-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 9px;
+}
+
+.delete-member-details span {
+  color: var(--color-text-secondary);
+}
+
+.delete-member-details strong {
+  color: var(--color-text);
+  overflow-wrap: anywhere;
+}
+
+.delete-warning-text {
+  color: #92400e !important;
+  background: #fef3c7;
+  border: 1px solid #fde68a;
+  border-radius: 8px;
+  line-height: 1.6;
+}
+
+.confirm-delete-button {
+  min-height: 40px;
+  padding: 10px 15px;
+  background: #b91c1c;
+  border-radius: 8px;
+}
+
+.confirm-delete-button:hover {
+  background: #991b1b;
+}
+
+.member-form-error {
+  color: var(--color-danger);
+  background: var(--color-danger-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  line-height: 1.6;
+}
+
+/* ---------- Disabled states ---------- */
+
+.save-member-button:disabled,
+.confirm-delete-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ==================================================
+   DARK THEME
+================================================== */
+
+[data-theme="dark"] .members-page {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .members-heading h1 {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .members-heading .eyebrow {
+  color: #93c5fd;
+}
+
+[data-theme="dark"] .member-stat-card,
+[data-theme="dark"] .members-panel {
+  background: #1f2937;
+  border-color: #374151;
+  box-shadow: var(--shadow-sm);
+}
+
+[data-theme="dark"] .member-stat-card span {
+  color: #a7b4c6;
+}
+
+[data-theme="dark"] .member-stat-card h2 {
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .member-stat-icon.blue {
+  color: #93c5fd;
+  background: #1e3a5f;
+}
+
+[data-theme="dark"] .member-stat-icon.green {
+  color: #6ee7b7;
+  background: #064e3b;
+}
+
+[data-theme="dark"] .member-stat-icon.orange {
+  color: #fdba74;
+  background: #7c2d12;
+}
+
+[data-theme="dark"] .members-panel-header h3 {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .member-search {
+  background: #273449;
+  border-color: #475569;
+}
+
+[data-theme="dark"] .member-search input {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .member-search input::placeholder {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .member-filter-tabs button {
+  color: #cbd5e1;
+  background: #1f2937;
+  border-color: #475569;
+}
+
+[data-theme="dark"] .member-filter-tabs button:hover {
+  color: #e5c77e;
+  background: #273449;
+  border-color: #c5a45d;
+}
+
+[data-theme="dark"] .member-filter-tabs button.active {
+  color: #ffffff;
+  background: #24558a;
+  border-color: #24558a;
+}
+
+[data-theme="dark"] .members-table-wrapper {
+  border-color: #374151;
+}
+
+[data-theme="dark"] .members-table th {
+  color: #cbd5e1;
+  background: #273449;
+  border-bottom-color: #374151;
+}
+
+[data-theme="dark"] .members-table td {
+  color: #cbd5e1;
+  border-bottom-color: #374151;
+}
+
+[data-theme="dark"] .members-table tbody tr:hover {
+  background: #273449;
+}
+
+[data-theme="dark"] .directory-member strong,
+[data-theme="dark"] .member-number-cell {
+  color: #f1f5f9 !important;
+}
+
+[data-theme="dark"] .directory-avatar {
+  color: #bfdbfe;
+  background: #1e3a5f;
+}
+
+[data-theme="dark"] .member-status.active {
+  color: #86efac;
+  background: #14532d;
+}
+
+[data-theme="dark"] .member-status.suspended,
+[data-theme="dark"] .member-status.inactive {
+  color: #fcd34d;
+  background: #78350f;
+}
+
+[data-theme="dark"] .member-status.disabled,
+[data-theme="dark"] .member-status.withdrawn {
+  color: #fca5a5;
+  background: #7f1d1d;
+}
+
+[data-theme="dark"] .member-status.left {
+  color: #cbd5e1;
+  background: #334155;
+}
+
+[data-theme="dark"] .member-actions button,
+[data-theme="dark"] .modal-close {
+  color: #cbd5e1;
+  background: #273449;
+  border-color: #475569;
+}
+
+[data-theme="dark"] .member-actions button:hover {
+  color: #e5c77e;
+  border-color: #c5a45d;
+}
+
+[data-theme="dark"] .member-actions .delete-member-action {
+  color: #fca5a5;
+  background: #450a0a;
+  border-color: #7f1d1d;
+}
+
+[data-theme="dark"] .member-actions .delete-member-action:hover {
+  color: #ffffff;
+  background: #b91c1c;
+}
+
+[data-theme="dark"] .member-modal,
+[data-theme="dark"] .member-delete-modal {
+  background: #1f2937;
+  border-color: #374151;
+}
+
+[data-theme="dark"] .member-modal-header {
+  border-bottom-color: #374151;
+}
+
+[data-theme="dark"] .member-modal-header h2,
+[data-theme="dark"] .member-delete-modal h2 {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .member-form-group label,
+[data-theme="dark"] .member-default-info strong {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .member-form-group > input,
+[data-theme="dark"] .member-input-icon {
+  color: #f1f5f9;
+  background: #273449;
+  border-color: #475569;
+}
+
+[data-theme="dark"] .member-form-group > input,
+[data-theme="dark"] .member-input-icon input {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .member-input-icon input {
+  color-scheme: dark;
+}
+
+[data-theme="dark"] .member-default-info {
+  color: #cbd5e1;
+  background: #273449;
+  border-color: #374151;
+}
+
+[data-theme="dark"] .member-default-info small {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .member-form-actions {
+  border-top-color: #374151;
+}
+
+[data-theme="dark"] .cancel-member-button {
+  color: #e2e8f0;
+  background: #273449;
+  border-color: #475569;
+}
+
+[data-theme="dark"] .cancel-member-button:hover {
+  background: #334155;
+}
+
+[data-theme="dark"] .delete-warning-icon {
+  color: #fca5a5;
+  background: #450a0a;
+}
+
+[data-theme="dark"] .delete-member-details {
+  background: #273449;
+  border-color: #475569;
+}
+
+[data-theme="dark"] .delete-member-details strong {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .delete-warning-text {
+  color: #fcd34d !important;
+  background: #451a03;
+  border-color: #78350f;
+}
+
+[data-theme="dark"] .member-form-error {
+  color: #fecaca;
+  background: #450a0a;
+  border-color: #7f1d1d;
+}
+
+/* ==================================================
+   RESPONSIVE MEMBER MANAGEMENT
+================================================== */
+
+@media (max-width: 900px) {
+  .member-statistics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .members-panel {
+    padding: 18px;
+  }
+}
+
+@media (max-width: 650px) {
+  .members-heading h1 {
+    font-size: 24px;
+  }
+
+  .members-heading {
+    gap: 15px;
+  }
+
+  .add-member-button {
+    width: 100%;
+  }
+
+  .member-statistics {
+    grid-template-columns: 1fr;
+  }
+
+  .members-panel {
+    padding: 15px;
+  }
+
+  .members-panel-header {
+    gap: 15px;
+  }
+
+  .member-search {
+    width: 100%;
+  }
+
+  .member-filter-tabs {
+    gap: 7px;
+  }
+
+  .member-filter-tabs button {
+    flex: 1 1 auto;
+    padding: 9px 10px;
+  }
+
+  .member-modal {
+    padding: 20px;
+  }
+
+  .member-delete-modal {
+    padding: 22px;
+  }
+
+  .delete-member-details {
+    grid-template-columns: 1fr;
+  }
+
+  .delete-member-details strong {
+    text-align: left;
+    margin-bottom: 7px;
+  }
+
+  .member-form-actions {
+    flex-wrap: wrap;
+  }
+}
